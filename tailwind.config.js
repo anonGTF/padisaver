@@ -9,7 +9,14 @@ export default {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["forest"]
+    themes: [
+      {
+        forest: {
+          ...require("daisyui/src/theming/themes")["forest"],
+          "accent": "#FFFFFF"
+        }
+      }
+    ]
   }
 }
 

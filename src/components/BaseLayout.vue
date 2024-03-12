@@ -16,7 +16,10 @@
     class="bg-neutral"
   >
     <main class="my-0 mx-auto min-h-screen max-w-md flex flex-col justify-center">
-      <div class="mx-4 max-w-300 overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+      <div 
+        class="max-w-300 overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']"
+        :class="horizontalMargin"
+      >
         <slot />
       </div>  
     </main>
@@ -24,12 +27,19 @@
 </template>
 
 <script setup>
+  import { computed } from "vue";
   import VideoBackground from "vue-responsive-video-background-player"
 
   const props = defineProps({
     useCustomBackground: {
       type: Boolean,
       default: false
+    },
+    fullScreen: {
+      type: Boolean,
+      default: false
     }
   })
+
+  const horizontalMargin = computed(() => props.fullScreen ? "" : "mx-4")
 </script>
