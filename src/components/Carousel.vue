@@ -4,7 +4,7 @@
       v-for="hama in items" 
       :key="hama.name" 
       class="carousel-item relative w-[320px] h-[480px] hover:cursor-pointer"
-      @click="router.push(`/detail/${hama.name.toLowerCase().replace(/\s+/g, '-')}`)"
+      @click="router.push(`/detail/${toLink(hama.name)}`)"
     >
       <img :src="hama.thumbnail" class="rounded-box absolute top-0 left-0 object-cover w-[320px] h-[480px]" />
       <div class="z-10 absolute bottom-0 left-0 w-full px-3 pb-3 pt-6 rounded-b-box bg-gradient-to-t from-black to-transparent">
@@ -17,6 +17,7 @@
 
 <script setup>
   import { useRouter } from "vue-router"
+  import { toLink } from "../utils/stringUtil";
   
   const router = useRouter()
 

@@ -46,6 +46,7 @@
   import { onMounted, onUpdated, ref } from 'vue'
   import CameraUtil from "../utils/camera"
   import BaseLayout from "../components/BaseLayout.vue"
+  import { toLink } from "../utils/stringUtil"
   import { onBeforeRouteLeave, useRouter } from 'vue-router';
 
   const isLoading = ref(false)
@@ -139,11 +140,15 @@
       })
 
       if (!response.ok) {
-        throw new Error("Network response was not ok")
+        throw new Error("Terdapat masalah pada jaringan")
       }
 
       const responseData = await response.json()
-      console.log(responseData)
+      if (responseData.predictions.length > 0) {
+        router.push(`/result/${toLink(responseData.predictions[0].class)}`)
+      } else {
+        throw new Error("Hasil tidak teridentifikasi!")
+      }
     } catch (error) {
       showError(error)
     } finally {

@@ -6,7 +6,6 @@
         <h1 class="text-lg font-semibold">Jenis-Jenis Hama 🪰</h1>
         <div></div>
       </div>
-
       <Carousel :items="listHama"/>
     </div>
   </BaseLayout>
