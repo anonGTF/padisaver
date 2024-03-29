@@ -1,42 +1,23 @@
-type FacingModeProps = "environment" | "user";
-
-type MediaConstraintsProps = {
-  video: VideoConstraintsProps;
-  audio: boolean;
-};
-
-type VideoConstraintsProps = {
-  facingMode: FacingModeProps;
-  width?: ResolutionRequestProps;
-  height?: ResolutionRequestProps;
-};
-
-type ResolutionRequestProps = {
-  min?: number;
-  max?: number;
-  ideal?: number;
-};
-
 export default class CameraUtil {
-  video!: HTMLVideoElement;
-  canvas!: HTMLCanvasElement;
-  customConstraint: MediaConstraintsProps = {} as MediaConstraintsProps;
-  devices: Array<unknown> = [];
-  stream: MediaStream = {} as MediaStream;
+  video = null
+  canvas = null
+  customConstraint = {}
+  devices = []
+  stream = {}
 
-  public constructor(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
-    this.video = video;
-    this.canvas = canvas;
+  constructor(video, canvas) {
+    this.video = video
+    this.canvas = canvas
   }
 
-  DEFAULT_CONSTRAINT: MediaConstraintsProps = {
+  DEFAULT_CONSTRAINT = {
     video: {
       facingMode: "user",
     },
     audio: false,
-  };
+  }
 
-  private constraint(): MediaConstraintsProps {
+  constraint() {
     if (Object.keys(this.customConstraint).length === 0) {
       return this.DEFAULT_CONSTRAINT;
     } else {
@@ -44,7 +25,7 @@ export default class CameraUtil {
     }
   }
 
-  private getDevices(): Promise<Array<unknown>> {
+  getDevices() {
     return new Promise((resolve, reject) => {
       if (this.devices.length > 0) {
         resolve(this.devices);
@@ -65,8 +46,8 @@ export default class CameraUtil {
     });
   }
 
-  public stop() {
-    if (!this.video && !(this.video as any)?.srcObject) return;
+  stop() {
+    if (!this.video && !(this.video)?.srcObject) return;
     if (this.video.srcObject instanceof MediaStream) {
       const tracks = this.video.srcObject.getTracks();
       tracks.forEach((track) => track.stop());
@@ -77,7 +58,7 @@ export default class CameraUtil {
     this.video.srcObject = null;
   }
 
-  private snap(): HTMLCanvasElement {
+  snap() {
     this.canvas.width = this.video.videoWidth;
     this.canvas.height = this.video.videoHeight;
     const context = this.canvas.getContext("2d");
@@ -86,8 +67,8 @@ export default class CameraUtil {
     return this.canvas;
   }
 
-  public requestPermission(): Promise<CameraUtil> {
-    return new Promise<CameraUtil>((resolve, reject) => {
+  requestPermission() {
+    return new Promise((resolve, reject) => {
       try {
         navigator.mediaDevices.getUserMedia(this.constraint()).then(() => {
           resolve(this);
@@ -98,8 +79,8 @@ export default class CameraUtil {
     });
   }
 
-  public start(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+  start() {
+    return new Promise((resolve, reject) => {
       try {
         this.getDevices().then(() => {
           navigator.mediaDevices.getUserMedia(this.constraint()).then((stream) => {
@@ -115,12 +96,12 @@ export default class CameraUtil {
     });
   }
 
-  public mirror(isMirror: boolean): CameraUtil {
+  mirror(isMirror) {
     this.video.style.transform = `scaleX(${isMirror ? "-1" : "1"})`;
     return this;
   }
 
-  public flipCamera(mode?: FacingModeProps): CameraUtil {
+  async flipCamera(mode) {
     if (mode) {
       this.setConstraint({
         video: {
@@ -144,7 +125,7 @@ export default class CameraUtil {
     this.stop();
 
     try {
-      this.start();
+      await this.start();
     } catch (err) {
       console.error("FlipCamera", err);
     }
@@ -152,7 +133,7 @@ export default class CameraUtil {
     return this;
   }
 
-  public snapAsBlob(mime = "image/png") {
+  snapAsBlob(mime = "image/png") {
     return new Promise((resolve, reject) => {
       try {
         this.snap().toBlob((blob) => resolve(blob), mime, 1);
@@ -163,7 +144,7 @@ export default class CameraUtil {
     });
   }
 
-  public snapAsBase64(mime = "image/png") {
+  snapAsBase64(mime = "image/png") {
     return new Promise((resolve, reject) => {
       try {
         resolve(this.snap().toDataURL(mime));
@@ -174,7 +155,7 @@ export default class CameraUtil {
     });
   }
 
-  public setConstraint(constraint: MediaConstraintsProps): CameraUtil {
+  setConstraint(constraint) {
     this.customConstraint = constraint;
     return this;
   }

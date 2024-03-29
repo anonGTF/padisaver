@@ -8,7 +8,7 @@
       <div class="absolute top-0 left-0 flex w-full justify-between items-center my-4 z-10">
         <mdi-chevron-left @click="router.back()" class="h-10 w-10 cursor-pointer"/>
         <h1 class="text-lg font-semibold">Ambil/Upload Gambar</h1>
-        <details class="dropdown dropdown-bottom dropdown-end">
+        <details class="dropdown dropdown-bottom dropdown-end me-2">
           <summary tabindex="0" role="button" class="btn m-1 bg-transparent border-none hover:bg-transparent p-0">
             <mdi-cog class="w-6 h-6"/>
           </summary>
@@ -24,10 +24,10 @@
           </div>
         </details>
       </div>
-      <p v-if="permissionDenied" class="absolute top-1/2 left-1/2 text-center">Tidak bisa mengakses kamera tanpa izin akses!</p>
+      <p v-if="permissionDenied" class="absolute top-1/2 w-full text-center">Tidak bisa mengakses kamera tanpa izin akses!</p>
       <video v-else ref="videoRef" autoplay class="w-full h-full"/>
       <canvas ref="canvasRef" class="hidden" />
-      <div class="w-full flex justify-between items-center absolute bottom-0 left-0 py-6 px-2 bg-neutral z-10">
+      <div class="w-full flex justify-between items-center absolute bottom-[50px] left-0 py-6 px-2 bg-neutral z-10">
         <button 
           class="btn btn-circle w-14 h-14 btn-accent"
           @click="fileInput.click()"
@@ -95,22 +95,13 @@
     camera.value = await new CameraUtil(videoRef.value, canvasRef.value)
       .setConstraint({
         video: {
-          facingMode: "user",
-          height: {
-            min: 480,
-            max: 1920,
-            ideal: 1920,
-          },
-          width: {
-            min: 480,
-            max: 1080,
-            ideal: 1080,
-          },
+          facingMode: "environment",
+          height: 720,
+          width: 1080,
         },
         audio: false,
       })
       .requestPermission()
-      .then((camera) => camera.mirror(true))
       .catch((err) => showError(err.message))
 
     camera.value?.start().finally(() => (isCameraOpen.value = true))

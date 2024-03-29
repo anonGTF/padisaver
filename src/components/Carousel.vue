@@ -13,7 +13,7 @@
       >
         <img :src="hama.thumbnail" class="rounded-t-box object-cover w-[320px]" :class="imgHeight" />
         <div class="w-full px-3 py-4 rounded-b-box bg-[#E6DEB9] text-[#3B2E1E]">
-          <p class="text-2xl font-semibold">{{ hama.name }}</p>
+          <p class="text-xl font-semibold">{{ hama.name }}</p>
           <p class="italic">{{ hama.scientificName }}</p>
         </div>
       </div>
