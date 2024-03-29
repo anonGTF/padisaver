@@ -68,6 +68,7 @@
   import BaseLayout from "../components/BaseLayout.vue"
   import { onBeforeRouteLeave, useRouter } from 'vue-router'
   import { useResultStore } from "../composables/useResultStore"
+  import imageCompression from 'browser-image-compression'
 
   const isLoading = ref(false)
   const errorMessage = ref("")
@@ -110,7 +111,7 @@
       })
       .requestPermission()
       .then((camera) => camera.mirror(true))
-      .catch((err) => showError(err))
+      .catch((err) => showError(err.message))
 
     camera.value?.start().finally(() => (isCameraOpen.value = true))
   }
@@ -130,13 +131,12 @@
 
   const snapCamera = async () => {
     videoRef.value?.pause()
-    const image = await camera.value.snapAsBase64()
+    const image = await camera.value.snapAsBlob()
     postData(image)
   }
 
   const fileSelected = async (event) => {
-    const image = await loadImageBase64(event.target.files[0])
-    postData(image)
+    postData(event.target.files[0])
   }
 
   const loadImageBase64 = (file) => {
@@ -151,12 +151,13 @@
   const postData = async (image) => {
     try {
       isLoading.value = true
+      const imageBase64 = (isUsingImageCompression) ? await compressImage(image) : await loadImageBase64(image)
       const response = await fetch("https://detect.roboflow.com/datasetfinalproject/6?api_key=9fHdyA8o2t9NN6pYHOfX", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: image
+        body: imageBase64
       })
 
       if (!response.ok) {
@@ -165,17 +166,28 @@
 
       const responseData = await response.json()
       if (responseData.predictions.length > 0) {
-        resultStore.image = image
+        resultStore.image = imageBase64
         resultStore.predictions = responseData
         router.push("/result")
       } else {
         throw new Error("Hasil tidak teridentifikasi!")
       }
     } catch (error) {
-      showError(error)
+      camera.value.start()
+      showError(error.message)
     } finally {
       isLoading.value = false
     }
+  }
+
+  const compressImage = async (image) => {
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1024,
+      useWebWorker: true,
+    }
+    const compressedImage = await imageCompression(image, options)
+    return await loadImageBase64(compressedImage)
   }
 
   const showError = async (message) => {
