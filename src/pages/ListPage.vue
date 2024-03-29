@@ -6,7 +6,7 @@
         <h1 class="text-lg font-semibold">Jenis-Jenis Hama 🪰</h1>
         <div></div>
       </div>
-      <Carousel :items="listHama"/>
+      <Carousel :items="listHama" class="my-auto"/>
     </div>
   </BaseLayout>
 </template>

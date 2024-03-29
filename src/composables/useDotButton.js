@@ -10,7 +10,11 @@ export const useDotButton = (emblaApi) => {
   }
 
   const onInit = (emblaApi) => {
-    scrollSnaps.value = emblaApi.value.scrollSnapList()
+    try {
+      scrollSnaps.value = emblaApi.value.scrollSnapList()
+    } catch (error) {
+      scrollSnaps.value = emblaApi.scrollSnapList()
+    }
   }
 
   const onSelect = (emblaApi) => {
