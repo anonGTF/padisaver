@@ -130,10 +130,12 @@ export default class CameraUtil {
         audio: this.constraint().audio,
       });
     } else {
+      const newFacingMode = this.constraint().video.facingMode == "user" ? "environment" : "user"
+      this.mirror(newFacingMode == "user")
       this.setConstraint({
         video: {
           ...this.constraint().video,
-          facingMode: this.constraint().video.facingMode == "user" ? "environment" : "user",
+          facingMode: newFacingMode,
         },
         audio: this.constraint().audio,
       });

@@ -90,7 +90,7 @@
         permissionDenied.value = true
         clearInterval(checkPermission)
       }
-    }, 3000)
+    }, 5000)
 
     camera.value = await new CameraUtil(videoRef.value, canvasRef.value)
       .setConstraint({
