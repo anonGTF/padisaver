@@ -10,6 +10,7 @@
     "deploy": "vite build && firebase deploy"
   },
   "dependencies": {
+    "embla-carousel-vue": "^8.0.0",
     "firebase": "^10.8.1",
     "markdown-it": "^14.0.0",
     "simple-vue-camera": "^1.1.3",
