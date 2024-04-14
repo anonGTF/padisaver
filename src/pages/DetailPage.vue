@@ -38,6 +38,7 @@
 <script setup>
   import MarkdownIt from "markdown-it"
   import BaseLayout from "../components/BaseLayout.vue"
+  import { toTitleCase } from "../utils/stringUtil"
   import { useRoute, useRouter } from "vue-router"
   import { listHama } from "../utils/data"
   import { computed } from "vue"
@@ -46,5 +47,5 @@
   const route = useRoute()
   const markdown = new MarkdownIt()
 
-  const data = computed(() => listHama.find(hama => hama.name == route.params.id.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')))
+  const data = computed(() => listHama.find(hama => hama.name == toTitleCase(route.params.id)))
 </script>../utils
