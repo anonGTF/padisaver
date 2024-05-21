@@ -156,7 +156,7 @@
       }
 
       const responseData = await response.json()
-      if (responseData.predictions.length > 0) {
+      if (responseData.predictions.length > 0 && responseData.predictions[0].confidence >= 0.5) {
         resultStore.image = imageBase64
         resultStore.predictions = responseData
         router.push("/result")
