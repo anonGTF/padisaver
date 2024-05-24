@@ -11,15 +11,21 @@
         <div></div>
       </div>
       <p v-if="permissionDenied" class="absolute top-1/2 w-full text-center">Tidak bisa mengakses kamera tanpa izin akses!</p>
-      <video 
-        v-else 
-        ref="videoRef" 
-        autoplay 
-        class="w-full h-full"
-        @loadeddata="detectFrame"
-      />
+      <div v-else class="relative w-full h-full">
+        <video 
+          ref="videoRef" 
+          autoplay
+          class="absolute top-[72px]"
+          @loadeddata="detectFrame"
+        />
+        <div
+          v-if="boundingBox != null"
+          class="absolute border-2 border-red-600"
+          :style="boundingBox"
+        ></div>
+      </div>
       <canvas ref="canvasRef" class="hidden" />
-      <div class="w-full absolute bottom-[50px] left-0 py-6 px-2 bg-neutral z-10">
+      <div class="w-full absolute bottom-[30px] left-0 p-2 bg-neutral z-10">
         <Carousel :items="resultList" narrow/>
       </div>
     </div>
@@ -44,6 +50,7 @@
   const camera = ref()
   const canvasRef = ref()
   const videoRef = ref()
+  const boundingBox = ref()
   const router = useRouter()
 
   const resultList = computed(() => listHama.filter((hama) => hama.tag == prediction.value?.class))
@@ -89,16 +96,40 @@
         model.value.detect(videoRef.value).then((result) => {
           if (result.length > 0 && result[0].confidence > 0.5) {
             prediction.value = result[0]
+            createBoundingBox()
             clearTimeout(counter.value)
           } else {
             counter.value = setTimeout(() => {
               prediction.value = null
+              boundingBox.value = null
             }, 1000)
           }
           requestAnimationFrame(detectFrame)
         })
     } catch (e) {
         console.log("Error caught:", e)
+    }
+  }
+
+  const createBoundingBox = () => {
+    const scaleX = videoRef.value.clientWidth / 1080
+    const scaleY = videoRef.value.clientHeight / 720
+
+    const x = prediction.value.bbox.x
+    const y = prediction.value.bbox.y
+    const width = prediction.value.bbox.width
+    const height = prediction.value.bbox.height
+
+    const x1 = (x - width / 2) * scaleX
+    const x2 = (x + width / 2) * scaleX
+    const y1 = (y - height / 2) * scaleY + 72
+    const y2 = (y + height / 2) * scaleY + 72
+
+    boundingBox.value = {
+      left: `${x1}px`,
+      top: `${y1}px`,
+      width: `${x2 - x1}px`, 
+      height: `${y2 - y1}px`,
     }
   }
 
