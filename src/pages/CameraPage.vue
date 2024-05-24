@@ -159,6 +159,7 @@
       if (responseData.predictions.length > 0 && responseData.predictions[0].confidence >= 0.5) {
         resultStore.image = imageBase64
         resultStore.predictions = responseData
+        fileInput.value = null
         router.push("/result")
       } else {
         throw new Error("Hasil tidak teridentifikasi!")
