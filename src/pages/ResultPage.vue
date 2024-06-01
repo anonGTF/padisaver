@@ -28,6 +28,15 @@
         <p class="text-lg text-black font-bold">{{ resultTime }} ms</p>
       </div>
 
+      <div v-if="compressionStore.initialSize != null" class="flex items-center gap-2 mt-4 p-4 bg-[#E6DEB9] rounded-full">
+        <span class="w-4 h-4 rounded-full bg-[#3B2E1E]"/>
+        <div class="flex-1">
+          <p class="text-lg text-black">Ukuran asli : <span class="font-semibold">{{ compressionStore.initialSize.toFixed(2) }} MB</span></p>
+          <p class="text-lg text-black">Ukuran terkompres : <span class="font-semibold">{{ compressionStore.compressedSize.toFixed(2) }} MB</span></p>
+        </div>
+        <p class="text-lg text-black font-semibold">({{ compressionStore.compressionRate.toFixed(0) }}%)</p>
+      </div>
+
       <p class="text-lg font-bold text-center mt-10 mb-2">Lihat cara menangani:</p>
 
       <Carousel :items="resultList" narrow/>
@@ -36,15 +45,17 @@
 </template>
 
 <script setup>
-  import { useRouter } from 'vue-router'
+  import { useRouter, onBeforeRouteLeave } from 'vue-router'
   import BaseLayout from '../components/BaseLayout.vue'
   import Carousel from '../components/Carousel.vue';
   import { listHama } from '../utils/data';
   import { ref, computed } from 'vue';
   import { useResultStore } from '../composables/useResultStore';
+  import { useCompressionStore } from '../composables/useCompressionStore';
   
   const router = useRouter()
   const resultStore = useResultStore()
+  const compressionStore = useCompressionStore()
   const imageRef = ref()
   const boundingBoxes = ref([])
   const highestScoreClass = computed(() => resultStore.predictions.predictions[0].class)
@@ -78,4 +89,10 @@
       }
     })
   }
+
+  onBeforeRouteLeave(() => {
+    compressionStore.initialSize = null
+    compressionStore.compressedSize = null
+    compressionStore.compressionRate = null
+  })
 </script>

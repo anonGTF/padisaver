@@ -16,9 +16,9 @@
             <div class="flex justify-between">
               <span>Kompres gambar</span>
               <input 
+                v-model="isUsingImageCompression"
                 type="checkbox" 
                 class="toggle toggle-secondary" 
-                :checked="isUsingImageCompression"
               />
             </div>
           </div>
@@ -68,6 +68,7 @@
   import BaseLayout from "../components/BaseLayout.vue"
   import { onBeforeRouteLeave, useRouter } from 'vue-router'
   import { useResultStore } from "../composables/useResultStore"
+  import { useCompressionStore } from "../composables/useCompressionStore"
   import imageCompression from 'browser-image-compression'
 
   const isLoading = ref(false)
@@ -81,6 +82,7 @@
   const isUsingImageCompression = ref(false)
   const router = useRouter()
   const resultStore = useResultStore()
+  const compressionStore = useCompressionStore()
 
   const initCamera = async () => {
     const checkPermission = setInterval(() => {
@@ -142,7 +144,7 @@
   const postData = async (image) => {
     try {
       isLoading.value = true
-      const imageBase64 = (isUsingImageCompression) ? await compressImage(image) : await loadImageBase64(image)
+      const imageBase64 = (isUsingImageCompression.value) ? await compressImage(image) : await loadImageBase64(image)
       const response = await fetch("https://detect.roboflow.com/datasetfinalproject/6?api_key=9fHdyA8o2t9NN6pYHOfX", {
         method: "POST",
         headers: {
@@ -179,6 +181,11 @@
       useWebWorker: true,
     }
     const compressedImage = await imageCompression(image, options)
+    const initialSize = image.size / 1024 / 1024
+    const compressedSize = compressedImage.size / 1024 / 1024
+    compressionStore.initialSize = initialSize
+    compressionStore.compressedSize = compressedSize
+    compressionStore.compressionRate = (1 - compressedSize / initialSize) * 100
     return await loadImageBase64(compressedImage)
   }
 
